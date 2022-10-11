@@ -85,7 +85,7 @@ Phi_new(iFuro)= NaN;
 Phi_new(p)= start;
 %%% ========================================================================
 %%%
-%%% Contador de iteraçõeste
+%%% Contador de iterações
 iter=0;
 %%% Erro máximo entre Phi_new e Phi_prev
 erro=max(max(abs(Phi_new-Phi_prev)));
@@ -205,6 +205,15 @@ end
 %%%==========================================================================
 %%%
 %%%      CORRENTE TOTAL (A)
-%%
+%%%
 Somat=sum(Phi_new(2,:))+sum(Phi_new(Ny-1,:))+sum(Phi_new(:,2))+sum(Phi_new(:,Nx-1));
-I=2;
+%%%
+%%%      CAMPO ELÉTRICO (V/m)
+%%%
+Ex=zeros(size(x));
+Ey=zeros(size(x));
+for k=1:size(p,1)
+    [i,j]=ind2sub(size(x),p(k));
+     Ex(i,j)=(Phi_new(i,j)+Phi_new(i,j+1)-Phi_new(i+1,j)-Phi_new(i+1,j+1))/(2*dx);
+     Ey(i,j)=(Phi_new(i,j)+Phi_new(i+1,j)-Phi_new(i,j+1)-Phi_new(i+1,j+1))/(2*dx);
+end

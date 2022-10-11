@@ -2,8 +2,8 @@
 %%%%        PTC3213 - EC1 - 2021 - DIFERENÇAS FINITAS
 %%%%
 %%%%    12552562 Felipe Keller Baltor
-%%%%    NUSP2 Aluno B
-%%%%    NUSP3 Aluno C
+%%%%    12745362 Mateus Patriani Cardoso
+%%%%    NUSP3 Fernando Otávio
 %%%%                           Complete os campos com ???????????????????????
 %%%%
 %%%%  /////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ Vmax=100.0;   % Volts
 %%%
 %%%  ======================================================================
 %%%
-%%%            Definicao do dominio
+%%%            Definicão do domínio
 %%%%
 %%%% A variavel dx abaixo é a discretização utilizada. Valores diferentes
 %%%% daqueles sugeridos abaixo não funcionarão. Diminua o dx para gerar a
@@ -205,15 +205,73 @@ end
 %%%==========================================================================
 %%%
 %%%      CORRENTE TOTAL (A)
-%%%
+%%
 Somat=sum(Phi_new(2,:))+sum(Phi_new(Ny-1,:))+sum(Phi_new(:,2))+sum(Phi_new(:,Nx-1));
+I= sigma*1*Somat;
 %%%
-%%%      CAMPO ELÉTRICO (V/m)
+%%%       RESISTENCIA em ohms
 %%%
-Ex=zeros(size(x));
-Ey=zeros(size(x));
-for k=1:size(p,1)
-    [i,j]=ind2sub(size(x),p(k));
-     Ex(i,j)=(Phi_new(i,j)+Phi_new(i,j+1)-Phi_new(i+1,j)-Phi_new(i+1,j+1))/(2*dx);
-     Ey(i,j)=(Phi_new(i,j)+Phi_new(i+1,j)-Phi_new(i,j+1)-Phi_new(i+1,j+1))/(2*dx);
-end
+R= (Vmax-Vmin)/I;
+%%%
+%%%        CAPACITANCIA em pF
+%%%
+Cap= ((epsr*eps0)*1*Somat*1e12)/(Vmax-Vmin); 
+%%%
+%%%     RESISTENCIA DUAL em ohms
+%%%
+Rdual= (1/((2*R)*1*sigma*sigma_dual*1));
+%%%
+%%%    VETOR DESLOCAMENTO
+%%%
+Dn=[Phi_new(2,1:Nx-1),Phi_new(1:Ny-1,Nx-1)',Phi_new(Ny-1,1:Nx-1),Phi_new(1:Ny-1,2)']*epsr*eps0/dx*100;
+%%
+%%   Densidade de carga mínima em nC/m^2
+%%
+Rho_s_min= -max(Dn)*1e9;
+%%
+%%  Numero de tubos de corrente
+%%
+nsnp= R*sigma*1;
+ntubos=10/nsnp;  %% CORRIGIDO
+%%%%==========================================================================
+%%%%              IMPRESSAO DE RESULTADOS NO TERMINAL 
+%%%%                  ATENCAO para as unidades:
+%%%%          R e Rdual em ohms     Cap em pF    Rho_s  em nC/m^2
+%%%%
+%%%%
+fprintf('\n\n nUSP: %d\n R = %g ohms\n C = %g pF\n Rho_s_min = %g nC/m^2\n Rdual = %g ohms\n Tubos: %g\n', NUSP, R, Cap, Rho_s_min,Rdual,floor(ntubos) );
+%%%
+%%%
+FIG=figure (1);
+%%
+%%%           TRACADO DE EQUIPOTENCIAIS
+%%%
+V=0:10:Vmax;
+colormap cool;
+[C,H]=contour(x,y,Phi_new,V);
+clabel(C,V);
+axis('equal');
+hold on
+%%%
+%%%   EQUIPOTENCIAIS PROBLEMA DUAL (para tracado dos quadrados curvilineos)
+%%%
+%%%
+%%%
+deltaV= (Vmax - Vmin) / floor(ntubos);
+V=0:deltaV:Vmax;
+colormap jet;
+contour(x,y,Dual_new,V);
+axis('equal');
+strusp=sprintf('%d',NUSP);
+titulo=['Mapa de Quadrados Curvilineos (EC1 2021) - ', strusp, ' - ', date()];
+title(titulo);
+hold off
+%%%
+%%%      ARQUIVO DE SAIDA COM O MAPA DOS QUADRADOS CURVILINEOS 
+%%%(Grava na pasta exibida no Navegador de Arq. da interface gráfica do Octave)
+%%%
+arq=['EC1_2021_QC_',strusp,'.png'];  
+print(FIG,arq);
+%%%%   ========================================================================
+%%%%  FIM
+%%%%

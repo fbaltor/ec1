@@ -3,7 +3,7 @@
 %%%%
 %%%%    12552562 Felipe Keller Baltor
 %%%%    12745362 Mateus Patriani Cardoso
-%%%%    NUSP3 Fernando Otávio
+%%%%    12552781 Fernando Otávio
 %%%%                           Complete os campos com ???????????????????????
 %%%%
 %%%%  /////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ Vmax=100.0;   % Volts
 %dx=0.05; % Tempo de execucao MUITO longo!!
 %dx=0.1;   % Tempo de execucao longo!!
 %dx=0.25;  % recomendado para a versao final
-dx=0.5;   %% Mude para dx=0.25 somente quando for gerar os resultados finais!!!
+dx=0.25;   %% Mude para dx=0.25 somente quando for gerar os resultados finais!!!
 erro=0.0;
 start=start_Dual= 50;
 iter=0;
